@@ -1,45 +1,74 @@
 import './App.css';
-import Layout from './components/Layout';
-import AuthLayout from './layouts/AuthLayout';
-import AboutPage from './pages/AboutPage';
-import ArticleListPage from './pages/ArticleListPage';
-import ArticlePage from './pages/ArticlePage';
-import HomePage from './pages/HomePage';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
-import NotFoundPage from './pages/NotFoundPage';
-import SignInPage from './pages/SignInPage';
-import SignUpPage from './pages/SignUpPage';
 
-const routes = [
+// Layouts
+import Layout from './layouts/Layout';
+import AuthLayout from './layouts/AuthLayout';
+import DashLayout from './layouts/DashLayout';
+
+// Landing Pages
+import HomePage from './pages/LandingPages/HomePage';
+import AboutPage from './pages/LandingPages/AboutPage';
+import ArticleListPage from './pages/LandingPages/ArticleListPage';
+import ArticlePage from './pages/LandingPages/ArticlePage';
+
+// Auth Pages
+import SignInPage from './pages/AuthPages/SignInPage';
+import SignUpPage from './pages/AuthPages/SignUpPage';
+
+// Dashboard Pages
+import DashboardPage from './pages/DashboardPages/DashboardPage';
+import ReportsPage from './pages/DashboardPages/ReportsPage';
+import UsersPage from './pages/DashboardPages/UsersPage';
+
+// Not Found
+import NotFoundPage from './pages/NotFoundPage';
+
+const router = createBrowserRouter([
+  // 🌐 Landing Pages
   {
     path: '/',
     element: <Layout />,
-    errorElement: <NotFoundPage />,
+    // ❌ INALIS ang errorElement dito — ito ang nag-cause ng issue
     children: [
-      { path: '/', element: <HomePage /> },
-      { path: '/about', element: <AboutPage /> },
-      { path: '/articles', element: <ArticleListPage /> },
-      { path: '/articles/:name', element: <ArticlePage /> },
-    ]
+      { index: true, element: <HomePage /> },
+      { path: 'about', element: <AboutPage /> },
+      { path: 'articles', element: <ArticleListPage /> },
+      { path: 'articles/:name', element: <ArticlePage /> },
+    ],
   },
+
+  // 🔐 Auth Pages
   {
     path: '/',
     element: <AuthLayout />,
     children: [
-      { path: '/signin', element: <SignInPage /> },
-      { path: '/signup', element: <SignUpPage /> },
-    ]
-  }
-]
+      { path: 'signin', element: <SignInPage /> },
+      { path: 'signup', element: <SignUpPage /> },
+    ],
+  },
 
-const router = createBrowserRouter(routes);
+  // 📊 Dashboard Pages
+  {
+    path: '/dashboard',
+    element: <DashLayout />,
+    errorElement: <NotFoundPage />, // ✅ Nandito na lang ang errorElement
+    children: [
+      { index: true, element: <DashboardPage /> },
+      { path: 'reports', element: <ReportsPage /> },
+      { path: 'users', element: <UsersPage /> },
+    ],
+  },
+
+  // ❌ Catch-all
+  {
+    path: '*',
+    element: <NotFoundPage />,
+  },
+]);
 
 function App() {
-  return (
-    <>
-      <RouterProvider router={router} />
-    </>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;

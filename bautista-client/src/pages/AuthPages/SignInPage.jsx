@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import Button from '../components/Button';
+import Button from '../../components/Button';
 
 const inputClasses = 'w-full border-2 border-pink-100 bg-white px-4 py-3 text-sm text-zinc-900 outline-none rounded-xl transition placeholder-zinc-400 focus:border-pink-400';
 
