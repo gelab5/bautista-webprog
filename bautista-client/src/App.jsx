@@ -25,11 +25,10 @@ import UsersPage from './pages/DashboardPages/UsersPage';
 import NotFoundPage from './pages/NotFoundPage';
 
 const router = createBrowserRouter([
-  // 🌐 Landing Pages
+  // Landing Pages
   {
     path: '/',
     element: <Layout />,
-    // ❌ INALIS ang errorElement dito — ito ang nag-cause ng issue
     children: [
       { index: true, element: <HomePage /> },
       { path: 'about', element: <AboutPage /> },
@@ -38,7 +37,7 @@ const router = createBrowserRouter([
     ],
   },
 
-  // 🔐 Auth Pages
+  // Auth Pages
   {
     path: '/',
     element: <AuthLayout />,
@@ -48,11 +47,11 @@ const router = createBrowserRouter([
     ],
   },
 
-  // 📊 Dashboard Pages
+  // Dashboard Pages
   {
     path: '/dashboard',
     element: <DashLayout />,
-    errorElement: <NotFoundPage />, // ✅ Nandito na lang ang errorElement
+    errorElement: <NotFoundPage />, 
     children: [
       { index: true, element: <DashboardPage /> },
       { path: 'reports', element: <ReportsPage /> },
@@ -60,7 +59,7 @@ const router = createBrowserRouter([
     ],
   },
 
-  // ❌ Catch-all
+  //Catch-all
   {
     path: '*',
     element: <NotFoundPage />,

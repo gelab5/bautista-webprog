@@ -1,36 +1,18 @@
+import { useLocation } from 'react-router-dom';
+import { BarChart } from '@mui/x-charts/BarChart';
 import { DataGrid } from '@mui/x-data-grid';
 import Stack from '@mui/material/Stack';
 import Box from '@mui/material/Box';
 import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import { Typography } from '@mui/material';
+import { Typography, CardContent } from '@mui/material';
 import { Gauge } from '@mui/x-charts/Gauge';
-import { BarChart } from '@mui/x-charts/BarChart';
 import { PieChart } from '@mui/x-charts/PieChart';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
 
 const columns = [
   { field: 'id', headerName: 'ID', width: 90 },
-  {
-    field: 'firstName',
-    headerName: 'First name',
-    width: 150,
-    editable: true,
-  },
-  {
-    field: 'lastName',
-    headerName: 'Last name',
-    width: 150,
-    editable: true,
-  },
-  {
-    field: 'age',
-    headerName: 'Age',
-    type: 'number',
-    width: 110,
-    editable: true,
-  },
+  { field: 'firstName', headerName: 'First name', width: 150, editable: true },
+  { field: 'lastName', headerName: 'Last name', width: 150, editable: true },
+  { field: 'age', headerName: 'Age', type: 'number', width: 110, editable: true },
   {
     field: 'fullName',
     headerName: 'Full name',
@@ -53,169 +35,190 @@ const rows = [
   { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
 ];
 
+const totalUsers = rows.length;
 const averageAge = (
   rows.reduce((sum, row) => sum + (row.age || 0), 0) /
   rows.filter((row) => row.age !== null).length
 ).toFixed(1);
+const youngestAge = Math.min(...rows.filter((row) => row.age !== null).map((row) => row.age));
+const seniorCount = rows.filter((row) => row.age !== null && row.age >= 60).length;
 
 function DashboardPage() {
+  const location = useLocation();
+
   return (
-    <>
-      <Typography variant="h4" gutterBottom>
-        Dashboard
-      </Typography>
+    <Box>
+      {/* Page Header */}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" gutterBottom>
+          Dashboard
+        </Typography>
+        <Typography variant="body1" color="text.secondary">
+          Overview of user statistics, quarterly performance, category breakdown, and completion metrics.
+        </Typography>
+      </Box>
 
-      {/* Row 1: Stat Cards + Gauges */}
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mb: 3 }}>
-        {/* Total Users */}
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Typography variant="overline" color="text.secondary">
-              Total Users
-            </Typography>
-            <Typography variant="h3" fontWeight={700}>
-              {rows.length}
-            </Typography>
-          </CardContent>
-        </Card>
+      <Stack spacing={3}>
+        {/* Summary Cards */}
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={3}>
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Total Users
+              </Typography>
+              <Typography variant="h4" fontWeight={700}>
+                {totalUsers}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Average Age
+              </Typography>
+              <Typography variant="h4" fontWeight={700}>
+                {averageAge}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Youngest User
+              </Typography>
+              <Typography variant="h4" fontWeight={700}>
+                {youngestAge}
+              </Typography>
+            </CardContent>
+          </Card>
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Seniors (60+)
+              </Typography>
+              <Typography variant="h4" fontWeight={700}>
+                {seniorCount}
+              </Typography>
+            </CardContent>
+          </Card>
+        </Stack>
 
-        {/* Average Age */}
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Typography variant="overline" color="text.secondary">
-              Average Age
-            </Typography>
-            <Typography variant="h3" fontWeight={700}>
-              {averageAge}
-            </Typography>
-          </CardContent>
-        </Card>
-
-        {/* Gauge 1 */}
-        <Card sx={{ flex: 1 }}>
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography variant="overline" color="text.secondary">
-              Performance
-            </Typography>
-            <Gauge width={100} height={100} value={50} />
-          </CardContent>
-        </Card>
-
-        {/* Gauge 2 */}
-        <Card sx={{ flex: 1 }}>
-          <CardContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Typography variant="overline" color="text.secondary">
-              Efficiency
-            </Typography>
-            <Gauge width={100} height={100} value={60} valueMin={10} valueMax={60} />
-          </CardContent>
-        </Card>
-      </Stack>
-
-      {/* Row 2: Bar Chart + Pie Chart */}
-      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ mb: 3 }}>
         {/* Bar Chart */}
-        <Card sx={{ flex: 2 }}>
+        <Card>
           <CardContent>
             <Typography variant="h6" gutterBottom>
               Quarterly Sales
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+              This chart compares two series of quarterly sales data across Q1 to Q4.
             </Typography>
             <BarChart
               series={[
                 { data: [35, 44, 24, 34], label: 'Series 1' },
                 { data: [51, 6, 49, 30], label: 'Series 2' },
               ]}
-              height={250}
-              xAxis={[{ data: ['Q1', 'Q2', 'Q3', 'Q4'], scaleType: 'band', label: 'Quarters' }]}
+              height={300}
+              xAxis={[{
+                data: ['Q1', 'Q2', 'Q3', 'Q4'],
+                scaleType: 'band',
+                label: 'Quarters',
+              }]}
             />
           </CardContent>
         </Card>
 
-        {/* Pie Chart */}
-        <Card sx={{ flex: 1 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Distribution
-            </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-              <PieChart
-                series={[
-                  {
+        {/* Pie Chart + Gauges Row */}
+        <Stack direction={{ xs: 'column', lg: 'row' }} spacing={3}>
+          {/* Pie Chart */}
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Category Breakdown
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Distribution of data across the three main series categories.
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <PieChart
+                  series={[{
                     data: [
                       { id: 0, value: 10, label: 'Series A' },
                       { id: 1, value: 15, label: 'Series B' },
                       { id: 2, value: 20, label: 'Series C' },
                     ],
                     cx: 100,
-                  },
-                ]}
-                width={350}
-                height={250}
-                slotProps={{
-                  legend: {
-                    direction: 'column',
-                    position: { vertical: 'middle', horizontal: 'right' },
-                    padding: 0,
-                  },
-                }}
-              />
-            </Box>
-          </CardContent>
-        </Card>
-      </Stack>
+                  }]}
+                  slotProps={{
+                    legend: {
+                      position: { vertical: 'middle', horizontal: 'right' },
+                      direction: 'column',
+                      padding: 0,
+                      itemMarkWidth: 12,
+                      itemMarkHeight: 12,
+                      markGap: 6,
+                      itemGap: 10,
+                    },
+                  }}
+                  width={380}
+                  height={220}
+                />
+              </Box>
+            </CardContent>
+          </Card>
 
-      {/* Row 3: DataGrid */}
-      <Card sx={{ mb: 3 }}>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Users Overview
-          </Typography>
-          <Box sx={{ height: 400, width: '100%' }}>
+          {/* Gauges */}
+          <Card sx={{ flex: 1 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Performance Gauges
+              </Typography>
+              <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
+                Current performance indicators based on the latest available metrics.
+              </Typography>
+              <Box sx={{ minHeight: 220, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 4 }}>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Gauge width={150} height={150} value={58} />
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Overall
+                  </Typography>
+                </Box>
+                <Box sx={{ textAlign: 'center' }}>
+                  <Gauge width={150} height={150} value={58} valueMin={10} valueMax={60} />
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                    Adjusted
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Stack>
+
+        {/* DataGrid */}
+        <Card>
+          <CardContent>
+            <Typography variant="h6" gutterBottom>
+              Users Overview
+            </Typography>
+            <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+              Complete list of users with editable fields for first name, last name, and age.
+            </Typography>
             <DataGrid
               rows={rows}
               columns={columns}
+              experimentalFeatures={{ newEditingApi: true }}
               initialState={{
                 pagination: {
-                  paginationModel: {
-                    pageSize: 5,
-                  },
+                  paginationModel: { pageSize: 5 },
                 },
               }}
               pageSizeOptions={[5]}
               checkboxSelection
               disableRowSelectionOnClick
             />
-          </Box>
-        </CardContent>
-      </Card>
-
-      {/* Row 4: Map */}
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Location Map
-          </Typography>
-          <Box sx={{ height: 500, width: '100%' }}>
-            <MapContainer
-              center={[14.604253, 120.994314]}
-              zoom={13}
-              style={{ height: '100%', width: '100%' }}
-            >
-              <TileLayer
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-              />
-              <Marker position={[14.604253, 120.994314]}>
-                <Popup>
-                  National University-Manila <br />
-                  551 F Jhocson St, Sampaloc, Manila, 1000 Metro Manila
-                </Popup>
-              </Marker>
-            </MapContainer>
-          </Box>
-        </CardContent>
-      </Card>
-    </>
+          </CardContent>
+        </Card>
+      </Stack>
+    </Box>
   );
 }
 
