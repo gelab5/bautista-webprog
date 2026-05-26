@@ -24,14 +24,16 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import AssessmentIcon from '@mui/icons-material/Assessment';
 import PeopleIcon from '@mui/icons-material/People';
+import ArticleIcon from '@mui/icons-material/Article';
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 
 const drawerWidth = 240;
 
 const dashboardNavItems = [
-  { label: 'Dashboard', title: 'Dashboard', to: '/dashboard', icon: DashboardIcon },
-  { label: 'Reports', title: 'Reports', to: '/dashboard/reports', icon: AssessmentIcon },
-  { label: 'Users', title: 'Users', to: '/dashboard/users', icon: PeopleIcon },
+  { label: 'Dashboard', title: 'Dashboard', to: '/dashboard',          icon: DashboardIcon,  roles: ['admin', 'editor', 'viewer'] },
+  { label: 'Reports',   title: 'Reports',   to: '/dashboard/reports',  icon: AssessmentIcon, roles: ['admin', 'editor'] },
+  { label: 'Users',     title: 'Users',     to: '/dashboard/users',    icon: PeopleIcon,     roles: ['admin'] },
+  { label: 'Articles',  title: 'Articles',  to: '/dashboard/articles', icon: ArticleIcon,    roles: ['admin', 'editor'] },
 ];
 
 const openedMixin = (theme) => ({
@@ -146,7 +148,13 @@ const DashLayout = () => {
 
   const handleDrawerOpen = () => setOpen(true);
   const handleDrawerClose = () => setOpen(false);
-  const handleLogout = () => navigate('/');
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('firstName');
+    localStorage.removeItem('role'); // ✅ updated from 'type' to 'role'
+    navigate('/');
+  };
 
   const getPageTitle = (pathname) => {
     const match = dashboardNavItems.find((item) => item.to === pathname);
@@ -154,6 +162,12 @@ const DashLayout = () => {
   };
 
   const pageTitle = getPageTitle(location.pathname);
+
+  // ✅ updated from 'type' to 'role'
+  const userRole = localStorage.getItem('role') || '';
+  const visibleNavItems = dashboardNavItems.filter((item) =>
+    item.roles.includes(userRole)
+  );
 
   return (
     <>
@@ -196,7 +210,7 @@ const DashLayout = () => {
           </DrawerHeader>
           <Divider />
           <List>
-            {dashboardNavItems.map(({ label, to, icon: NavIcon }) => (
+            {visibleNavItems.map(({ label, to, icon: Icon }) => (
               <ListItem key={to} disablePadding sx={{ display: 'block' }}>
                 <ListItemButton
                   component={Link}
@@ -218,7 +232,7 @@ const DashLayout = () => {
                       justifyContent: 'center',
                     }}
                   >
-                    <NavIcon />
+                    <Icon />
                   </ListItemIcon>
                   <ListItemText primary={label} sx={{ opacity: open ? 1 : 0 }} />
                 </ListItemButton>

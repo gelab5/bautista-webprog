@@ -1,12 +1,32 @@
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import Button from '../../components/Button';
-import articles from '../../assets/article-content.js';
+import { getArticle } from '../../ArticleService';
 
 function ArticlePage() {
   const { name } = useParams();
-  const article = articles.find(article => article.name === name);
+  const [article, setArticle] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
 
-  if (!article) {
+  useEffect(() => {
+    getArticle(name)
+      .then(setArticle)
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false));
+  }, [name]);
+
+  if (loading) {
+    return (
+      <div className="flex w-full flex-col gap-6">
+        <section className="border-y-2 border-pink-100 bg-white px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
+          <p className="text-sm text-gray-400">Loading article...</p>
+        </section>
+      </div>
+    );
+  }
+
+  if (notFound || !article) {
     return (
       <div className="flex w-full flex-col gap-6">
         <section className="border-y-2 border-pink-100 bg-white px-4 py-10 sm:px-6 sm:py-14 lg:px-8">
@@ -43,8 +63,7 @@ function ArticlePage() {
             {article.title}
           </h1>
           <p className="mt-2 text-sm text-gray-400">
-            {article.name.split('-').map(word => word.charAt(0).toUpperCase() +
-            word.slice(1)).join(' ')}
+            {article.name.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
           </p>
         </div>
       </section>

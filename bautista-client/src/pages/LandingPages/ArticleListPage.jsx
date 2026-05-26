@@ -1,8 +1,18 @@
+import { useState, useEffect } from 'react';
 import Button from '../../components/Button';
 import ArticleList from '../../components/ArticleList';
-import articles from '../../assets/article-content.js';
+import { getArticles } from '../../ArticleService';
 
 const ArticleListPage = () => {
+  const [articles, setArticles] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    getArticles()
+      .then((data) => setArticles(data.filter((a) => a.status === 'Active')))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <div className="flex w-full flex-col gap-6">
 
@@ -30,11 +40,17 @@ const ArticleListPage = () => {
           <h2 className="mt-2 text-2xl font-semibold text-gray-900">Article card grid</h2>
         </div>
 
-        <ArticleList articles={articles} />
+        {loading ? (
+          <p className="text-sm text-gray-400">Loading articles...</p>
+        ) : articles.length === 0 ? (
+          <p className="text-sm text-gray-400">No articles available.</p>
+        ) : (
+          <ArticleList articles={articles} />
+        )}
       </section>
 
     </div>
   );
-}
+};
 
-export default ArticleListPage
+export default ArticleListPage;
